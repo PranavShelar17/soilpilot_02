@@ -23,10 +23,13 @@ const nextConfig = {
     ];
   },
   async rewrites() {
-    const backendUrl =
+    let backendUrl =
       process.env.BACKEND_URL ||
       process.env.BACKEND_INTERNAL_URL ||
       (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:8000");
+    if (backendUrl && !backendUrl.startsWith("http://") && !backendUrl.startsWith("https://")) {
+      backendUrl = `https://${backendUrl}`;
+    }
     return [
       {
         source: "/api/v1/:path*",

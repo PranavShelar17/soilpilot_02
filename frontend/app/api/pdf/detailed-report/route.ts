@@ -9,10 +9,13 @@ export async function GET(request: NextRequest) {
     const lang = searchParams.get("lang") || "en";
     const token = searchParams.get("token") || "";
 
-    const backendUrl =
+    let backendUrl =
       process.env.BACKEND_URL ||
       process.env.BACKEND_INTERNAL_URL ||
       (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://127.0.0.1:8000");
+    if (backendUrl && !backendUrl.startsWith("http://") && !backendUrl.startsWith("https://")) {
+      backendUrl = `https://${backendUrl}`;
+    }
     const targetUrl = new URL(`/api/v1/reports/${encodeURIComponent(fieldId)}/detailed/pdf`, backendUrl);
     targetUrl.searchParams.set("lang", lang);
     if (token) {

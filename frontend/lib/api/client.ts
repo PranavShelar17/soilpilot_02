@@ -1,10 +1,20 @@
 import axios, { AxiosInstance } from "axios";
 
-const baseURL =
+const normalizeUrl = (url?: string) => {
+  if (!url) return "";
+  if (url.startsWith("/") || url.startsWith("http://") || url.startsWith("https://")) {
+    return url;
+  }
+  return `https://${url}`;
+};
+
+const rawBase =
   process.env.NEXT_PUBLIC_API_URL ||
   (typeof window !== "undefined"
     ? "/api/v1"
-    : `${process.env.BACKEND_URL || "http://localhost:8000"}/api/v1`);
+    : `${normalizeUrl(process.env.BACKEND_URL) || "http://localhost:8000"}/api/v1`);
+
+const baseURL = normalizeUrl(rawBase) || rawBase;
 
 export const api: AxiosInstance = axios.create({
   baseURL,
