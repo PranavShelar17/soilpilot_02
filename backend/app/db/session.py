@@ -29,10 +29,13 @@ def create_db_engine():
                 f"PostgreSQL connection at {db_url} is unavailable ({err}). "
                 "Using local SQLite database fallback for development."
             )
-            # Ensure database directory exists
-            db_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../database"))
-            os.makedirs(db_dir, exist_ok=True)
-            sqlite_path = os.path.join(db_dir, "soilpilot.db")
+            # Ensure database directory exists (handle read-only filesystems in serverless like Vercel)
+            try:
+                db_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../database"))
+                os.makedirs(db_dir, exist_ok=True)
+                sqlite_path = os.path.join(db_dir, "soilpilot.db")
+            except OSError:
+                sqlite_path = "/tmp/soilpilot.db"
             sqlite_url = f"sqlite:///{sqlite_path}"
             engine = create_engine(sqlite_url, connect_args={"check_same_thread": False})
             Base.metadata.create_all(engine)
